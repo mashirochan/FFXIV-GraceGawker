@@ -43,21 +43,21 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.Spacing();
         ImGui.Separator();
-        CenteredText("Format Settings");
+        CenteredText("Display Settings");
         ImGui.Separator();
         ImGui.Spacing();
 
-        var hideForCombatJobs = config.HideForCombatJobs;
-        if (ImGui.Checkbox("Hide for Combat Jobs", ref hideForCombatJobs))
+        var hideForWrongJobs = config.HideForWrongJobs;
+        if (ImGui.Checkbox("Hide for Wrong Jobs", ref hideForWrongJobs))
         {
-            config.HideForCombatJobs = hideForCombatJobs;
-            Plugin.Logger.Debug($"HideForCombatJobs set to: {(hideForCombatJobs ? "True" : "False")}");
+            config.HideForWrongJobs = hideForWrongJobs;
+            Plugin.Logger.Debug($"HideForWrongJobs set to: {(hideForWrongJobs ? "True" : "False")}");
             config.Save();
         }
 
         ImGui.Spacing();
         ImGui.Separator();
-        CenteredText("Display Settings");
+        CenteredText("Format Settings");
         ImGui.Separator();
         ImGui.Spacing();
 

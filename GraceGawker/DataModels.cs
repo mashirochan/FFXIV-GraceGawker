@@ -4,8 +4,12 @@ namespace GraceGawker
 {
     public class DataModels
     {
-        public static readonly List<uint> NonCombatJobIds = [
-            8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+        public static readonly List<uint> GathererJobs = [
+            16, 17, 18
+            ];
+
+        public static readonly List<uint> CrafterJobs = [
+            8, 9, 10, 11, 12, 13, 14, 15
             ];
 
         public enum PlayerState

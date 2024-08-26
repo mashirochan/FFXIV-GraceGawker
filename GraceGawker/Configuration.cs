@@ -22,7 +22,7 @@ public class Configuration : IPluginConfiguration
 
     public bool ShowManualName { get; set; } = true;
 
-    public bool HideForCombatJobs { get; set; } = false;
+    public bool HideForWrongJobs { get; set; } = false;
 
     public void Save()
     {

@@ -213,11 +213,19 @@ public unsafe class Plugin : IDalamudPlugin
 
     private bool PassesJobCheck()
     {
-        if (ClientState.LocalPlayer == null)
+        if (ClientState.LocalPlayer == null || Config.CurrentManual == null)
             return false;
 
-        if (Config.HideForCombatJobs && !DataModels.NonCombatJobIds.Contains(ClientState.LocalPlayer.ClassJob.Id))
+        if (Config.HideForWrongJobs)
+        {
+            if (Config.CurrentManual.Type == DataModels.ManualType.Gathering && DataModels.GathererJobs.Contains(ClientState.LocalPlayer.ClassJob.Id))
+                return true;
+
+            if (Config.CurrentManual.Type == DataModels.ManualType.Crafting && DataModels.CrafterJobs.Contains(ClientState.LocalPlayer.ClassJob.Id))
+                return true;
+
             return false;
+        }
 
         return true;
     }
