@@ -232,14 +232,26 @@ public unsafe class Plugin : IDalamudPlugin
 
     private void OnFlyText(ref FlyTextKind kind, ref int val1, ref int val2, ref SeString text1, ref SeString text2, ref uint color, ref uint icon, ref uint damageTypeIcon, ref float yOffset, ref bool handled)
     {
-        if (kind != FlyTextKind.BuffFading || (kind == FlyTextKind.BuffFading && text1.TextValue != "- Gatherer's Grace" && text1.TextValue != "- Crafter's Grace"))
-            return;
+        //Logger.Debug("New Fly Text: " + text1.TextValue);
+        if (kind == FlyTextKind.Buff)
+        {
+            if (text1.TextValue != "+ Gatherer's Grace" && text1.TextValue != "+ Crafter's Grace")
+                return;
 
-        Config.CurrentManual = null;
-        Config.RemainingExp = 0;
-        Logger.Info("Grace buff has either expired or been removed!");
+            Logger.Info("Grace buff has been applied!");
+            ShouldBeOpen = true;
+        }
+        else if (kind == FlyTextKind.BuffFading)
+        {
+            if (text1.TextValue != "- Gatherer's Grace" && text1.TextValue != "- Crafter's Grace")
+                return;
 
-        ShouldBeOpen = false;
+            Config.CurrentManual = null;
+            Config.RemainingExp = 0;
+            Logger.Info("Grace buff has either expired or been removed!");
+
+            ShouldBeOpen = false;
+        }
     }
 
     private void OnConditionChange(ConditionFlag flag, bool value)
