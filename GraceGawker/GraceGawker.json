@@ -1,14 +1,15 @@
 {
-  "Author": "Fuwa Aika",
-  "Name": "Grace Gawker",
-  "Punchline": "View the remaining XP on Crafter's/Gatherer's Grace",
-  "Description": "An overlay plugin that displays the remaining XP for your Crafter's/Gatherer's Grace buffs.",
-  "ApplicableVersion": "any",
-  "Tags": [
-    "crafting",
-    "gathering",
-    "xp",
-    "grace",
-    "buff"
-  ]
+    "Author": "Fuwa Aika",
+    "Name": "Grace Gawker",
+    "Punchline": "View the remaining XP on Crafter's/Gatherer's Grace",
+    "Description": "An overlay plugin that displays the remaining XP for your Crafter's/Gatherer's Grace buffs.",
+    "RepoUrl": "https://github.com/mashirochan/FFXIV-GraceGawker",
+    "ApplicableVersion": "any",
+    "Tags": [
+        "crafting",
+        "gathering",
+        "xp",
+        "grace",
+        "buff"
+    ]
 }
