@@ -12,6 +12,10 @@ using Dalamud.Hooking;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.Inventory.InventoryEventArgTypes;
+using Dalamud.Game.Inventory;
+using Lumina.Excel.GeneratedSheets;
+using System.Collections.Generic;
 
 namespace GraceGawker;
 
@@ -26,7 +30,8 @@ public unsafe class Plugin : IDalamudPlugin
     [PluginService] internal static ISigScanner SigScanner { get; private set; } = null!;
     [PluginService] internal static ICondition Condition { get; private set; } = null!;
     [PluginService] internal static IFlyTextGui FlyText { get; private set; } = null!;
-    [PluginService] internal static IFramework framework { get; private set; } = null!;
+    [PluginService] internal static IFramework Framework { get; private set; } = null!;
+    [PluginService] internal static IGameInventory Inventory { get; private set; } = null!;
 
     public readonly WindowSystem WindowSystem = new("GraceGawker");
 
@@ -35,6 +40,8 @@ public unsafe class Plugin : IDalamudPlugin
     private MainWindow MainWindow { get; init; }
     public DataModels.PlayerState playerState { get; set; } = DataModels.PlayerState.Inactive;
     public static bool ShouldBeOpen { get; private set; } = false;
+    private bool WaitingForItemDeletion { get; set; } = false;
+    private DataModels.Manual? item { get; set; } = null;
 
     public Plugin()
     {
@@ -57,7 +64,8 @@ public unsafe class Plugin : IDalamudPlugin
         FlyText.FlyTextCreated += OnFlyText;
         Condition.ConditionChange += OnConditionChange;
         ClientState.Login += OnLogin;
-        framework.Update += OnUpdate;
+        Framework.Update += OnUpdate;
+        Inventory.ItemChanged += OnItemChanged;
 
         if (ClientState.IsLoggedIn == true)
             InitManual();
@@ -81,7 +89,6 @@ public unsafe class Plugin : IDalamudPlugin
 
     private bool UseActionDetour(ActionManager* actionManager, ActionType actionType, uint actionID, ulong targetID, uint a4, ActionManager.UseActionMode a5, uint a6, bool* a7)
     {
-        DataModels.Manual? item = null;
         try
         {
             Logger.Debug($"Action Used: Type = {actionType}, ID = {actionID}, Target ID = {targetID}");
@@ -96,19 +103,27 @@ public unsafe class Plugin : IDalamudPlugin
         }
 
         var useActionReturn = useActionHook!.Original(actionManager, actionType, actionID, targetID, a4, a5, a6, a7);
-        Logger.Debug($"useActionReturn: {useActionReturn}");
-        Logger.Debug($"item != null: {item != null}");
-        // if (useActionReturn == true && item != null)
         if (item != null)
         {
-            Config.CurrentManual = item;
-            Config.RemainingExp = Config.CurrentManual.MaxExp;
-            Logger.Info($"{item!.Name} was used successfully!");
-
-            ShouldBeOpen = true;
+            WaitingForItemDeletion = true;
+            Logger.Debug("WaitingForItemDeletion set to: True");
         }
 
         return useActionReturn;
+    }
+
+    private void OnItemChanged(GameInventoryEvent type, InventoryEventArgs data)
+    {
+        if (!WaitingForItemDeletion || item == null || data.Item.ItemId != item.Id)
+            return;
+
+        Config.CurrentManual = item;
+        Config.RemainingExp = Config.CurrentManual.MaxExp;
+        Logger.Info($"{item!.Name} was used successfully!");
+
+        ShouldBeOpen = true;
+        item = null;
+        WaitingForItemDeletion = false;
     }
 
     private const string ActorControlSig = "E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64";
@@ -232,16 +247,7 @@ public unsafe class Plugin : IDalamudPlugin
 
     private void OnFlyText(ref FlyTextKind kind, ref int val1, ref int val2, ref SeString text1, ref SeString text2, ref uint color, ref uint icon, ref uint damageTypeIcon, ref float yOffset, ref bool handled)
     {
-        //Logger.Debug("New Fly Text: " + text1.TextValue);
-        if (kind == FlyTextKind.Buff)
-        {
-            if (text1.TextValue != "+ Gatherer's Grace" && text1.TextValue != "+ Crafter's Grace")
-                return;
-
-            Logger.Info("Grace buff has been applied!");
-            ShouldBeOpen = true;
-        }
-        else if (kind == FlyTextKind.BuffFading)
+        if (kind == FlyTextKind.BuffFading)
         {
             if (text1.TextValue != "- Gatherer's Grace" && text1.TextValue != "- Crafter's Grace")
                 return;
