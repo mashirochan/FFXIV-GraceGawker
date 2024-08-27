@@ -211,6 +211,10 @@ public unsafe class Plugin : IDalamudPlugin
             Config.RemainingExp = 0;
             return;
         }
+        else
+        {
+            Logger.Debug("No manual set and no grace buff found, ignoring initialization!");
+        }
     }
 
     private void OnUpdate(IFramework framework)

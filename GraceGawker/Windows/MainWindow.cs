@@ -16,6 +16,7 @@ public class MainWindow : Window, IDisposable
         Size = new Vector2(250, 66);
         SizeCondition = ImGuiCond.Once;
         RespectCloseHotkey = false;
+        DisableWindowSounds = true;
 
         config = plugin.Config;
         configWindow = _configWindow;
