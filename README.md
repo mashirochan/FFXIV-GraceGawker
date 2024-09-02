@@ -1,4 +1,7 @@
 # Grace Gawker
+[![Version number](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmashirochan%2FFFXIV-GraceGawker%2Fmaster%2FGraceGawker%2FGraceGawker.csproj&query=%2F%2FProject%2FPropertyGroup%2FVersion&label=version&color=%23ff6262)](https://github.com/mashirochan/GraceGawker)
+[![Download count](https://img.shields.io/endpoint?url=https%3A%2F%2Fqzysathwfhebdai6xgauhz4q7m0mzmrf.lambda-url.us-east-1.on.aws%2FGraceGawker&color=%23ff6262)](https://github.com/mashirochan/GraceGawker)
+[![Availability](https://img.shields.io/badge/availability-testing-orange)](https://github.com/mashirochan/GraceGawker)
 
 ![H4neEFo](https://github.com/user-attachments/assets/d862b418-71fc-46f6-a14a-846860545858)
 
