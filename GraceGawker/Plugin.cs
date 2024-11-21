@@ -14,8 +14,7 @@ using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Inventory.InventoryEventArgTypes;
 using Dalamud.Game.Inventory;
-using Lumina.Excel.GeneratedSheets;
-using System.Collections.Generic;
+using Lumina.Excel.Sheets;
 
 namespace GraceGawker;
 
@@ -237,10 +236,10 @@ public unsafe class Plugin : IDalamudPlugin
 
         if (Config.HideForWrongJobs)
         {
-            if (Config.CurrentManual.Type == DataModels.ManualType.Gathering && DataModels.GathererJobs.Contains(ClientState.LocalPlayer.ClassJob.Id))
+            if (Config.CurrentManual.Type == DataModels.ManualType.Gathering && DataModels.GathererJobs.Contains(ClientState.LocalPlayer.ClassJob.RowId))
                 return true;
 
-            if (Config.CurrentManual.Type == DataModels.ManualType.Crafting && DataModels.CrafterJobs.Contains(ClientState.LocalPlayer.ClassJob.Id))
+            if (Config.CurrentManual.Type == DataModels.ManualType.Crafting && DataModels.CrafterJobs.Contains(ClientState.LocalPlayer.ClassJob.RowId))
                 return true;
 
             return false;

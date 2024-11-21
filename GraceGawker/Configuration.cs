@@ -18,6 +18,8 @@ public class Configuration : IPluginConfiguration
 
     public bool ShowPercent { get; set; } = true;
 
+    public bool ColorPercent { get; set; } = true;
+
     public bool ShowPercentOnBar { get; set; } = false;
 
     public bool ShowManualName { get; set; } = true;

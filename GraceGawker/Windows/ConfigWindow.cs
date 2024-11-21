@@ -81,6 +81,16 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.Spacing();
 
+        var colorPercent = config.ColorPercent;
+        if (ImGui.Checkbox("Color Percent", ref colorPercent))
+        {
+            config.ColorPercent = colorPercent;
+            Plugin.Logger.Debug($"ColorPercent set to: {(colorPercent ? "True" : "False")}");
+            config.Save();
+        }
+
+        ImGui.Spacing();
+
         var showPercentOnBar = config.ShowPercentOnBar;
         if (ImGui.Checkbox("Show Percent On Bar", ref showPercentOnBar))
         {

@@ -1,5 +1,7 @@
 using System;
+using System.Drawing;
 using System.Numerics;
+using Dalamud.Interface;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 
@@ -58,8 +60,6 @@ public class MainWindow : Window, IDisposable
 
             // Draw the rectangle (outline) around the window using the foreground draw list
             drawList.AddRect(outlinePos, outlineSize, outlineColor, 0.0f, ImDrawFlags.None, thickness);
-
-
         }
 
         if (config.CurrentManual != null && config.CurrentManual.MaxExp != 0)
@@ -78,12 +78,15 @@ public class MainWindow : Window, IDisposable
             if (config.ShowPercent)
             {
                 ImGui.SameLine(250 - ImGui.CalcTextSize(progressPercent).X);
-                ImGui.Text(progressPercent + '%');
+                if (config.ColorPercent && Plugin.ClientState.LocalPlayer != null && Plugin.ClientState.LocalPlayer.Level >= config.CurrentManual.PenaltyLevel)
+                {
+                    ImGui.TextColored(KnownColor.Yellow.Vector(), progressPercent + '%');
+                }
+                else
+                {
+                    ImGui.Text(progressPercent + '%');
+                }
             }
-
-            //ImGui.Spacing();
-
-            //ImGui.Text(Plugin.playerState.ToString());
         }
     }
 }
