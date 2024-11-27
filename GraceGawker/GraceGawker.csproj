@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="Dalamud.Plugin.Bootstrap.targets" />
   <PropertyGroup>
-    <Version>0.1.1.0</Version>
+    <Version>1.1.2.0</Version>
     <Description>An overlay plugin that displays the remaining XP for your Crafter's/Gatherer's Grace buffs.</Description>
     <PackageProjectUrl>https://github.com/mashirochan/FFXIV-GraceGawker</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>

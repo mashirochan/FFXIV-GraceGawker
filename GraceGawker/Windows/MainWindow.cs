@@ -28,6 +28,12 @@ public class MainWindow : Window, IDisposable
 
     public override void PreDraw()
     {
+        if (!config.UseDalamudBackground)
+        {
+            var newOpacity = config.BackgroundOpacity / 100f;
+            ImGui.SetNextWindowBgAlpha(newOpacity);
+        }
+
         if (config.IsMainWindowMovable)
         {
             Flags &= ~ImGuiWindowFlags.NoMove;

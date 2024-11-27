@@ -24,6 +24,10 @@ public class Configuration : IPluginConfiguration
 
     public bool ShowManualName { get; set; } = true;
 
+    public bool UseDalamudBackground { get; set; } = false;
+
+    public int BackgroundOpacity { get; set; } = 100;
+
     public bool HideForWrongJobs { get; set; } = false;
 
     public void Save()

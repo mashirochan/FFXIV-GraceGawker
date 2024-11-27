@@ -14,14 +14,12 @@ using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Inventory.InventoryEventArgTypes;
 using Dalamud.Game.Inventory;
-using Lumina.Excel.Sheets;
 
 namespace GraceGawker;
 
 public unsafe class Plugin : IDalamudPlugin
 {
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
-    [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
     [PluginService] internal static IPluginLog Logger { get; private set; } = null!;

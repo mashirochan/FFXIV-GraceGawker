@@ -47,6 +47,32 @@ public class ConfigWindow : Window, IDisposable
         ImGui.Separator();
         ImGui.Spacing();
 
+        var useDalamudBackground = config.UseDalamudBackground;
+        if (ImGui.Checkbox("Use Dalamud BG Style", ref useDalamudBackground))
+        {
+            config.UseDalamudBackground = useDalamudBackground;
+            Plugin.Logger.Debug($"UseDalamudBackground set to: {(useDalamudBackground ? "True" : "False")}");
+            config.Save();
+        }
+
+        ImGui.Spacing();
+
+        ImGui.PushItemWidth(100);
+        ImGui.BeginDisabled(config.UseDalamudBackground);
+
+        var backgroundOpacity = config.BackgroundOpacity;
+        if (ImGui.SliderInt("BG Opacity", ref backgroundOpacity, 0, 100))
+        {
+            config.BackgroundOpacity = backgroundOpacity;
+            Plugin.Logger.Debug($"BackgroundOpacity set to: {backgroundOpacity}");
+            config.Save();
+        }
+
+        ImGui.PopItemWidth();
+        ImGui.EndDisabled();
+
+        ImGui.Spacing();
+
         var hideForWrongJobs = config.HideForWrongJobs;
         if (ImGui.Checkbox("Hide for Wrong Jobs", ref hideForWrongJobs))
         {
