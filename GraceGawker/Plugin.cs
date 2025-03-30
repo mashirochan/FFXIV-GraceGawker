@@ -65,7 +65,9 @@ public unsafe class Plugin : IDalamudPlugin
         Inventory.ItemChanged += OnItemChanged;
 
         if (ClientState.IsLoggedIn == true)
-            InitManual();
+        {
+            Framework.RunOnTick(() => { InitManual(); });
+        }
 
         SetUpHooks();
     }
