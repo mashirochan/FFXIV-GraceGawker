@@ -1,19 +1,18 @@
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Command;
-using Dalamud.IoC;
-using Dalamud.Plugin;
-using Dalamud.Interface.Windowing;
-using Dalamud.Plugin.Services;
-using GraceGawker.Windows;
-using System.Linq;
-using System;
 using Dalamud.Game.Gui.FlyText;
+using Dalamud.Game.Inventory;
+using Dalamud.Game.Inventory.InventoryEventArgTypes;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Hooking;
+using Dalamud.Interface.Windowing;
+using Dalamud.IoC;
+using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using Dalamud.Game;
-using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.Inventory.InventoryEventArgTypes;
-using Dalamud.Game.Inventory;
+using GraceGawker.Windows;
+using System;
+using System.Linq;
 
 namespace GraceGawker;
 
@@ -22,6 +21,8 @@ public unsafe class Plugin : IDalamudPlugin
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
+    [PluginService] internal static IPlayerState PlayerState { get; private set; } = null!;
+    [PluginService] internal static IObjectTable ObjectTable { get; private set; } = null!;
     [PluginService] internal static IPluginLog Logger { get; private set; } = null!;
     [PluginService] internal static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
     [PluginService] internal static ISigScanner SigScanner { get; private set; } = null!;
@@ -35,7 +36,7 @@ public unsafe class Plugin : IDalamudPlugin
     public Configuration Config { get; init; }
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
-    public DataModels.PlayerState playerState { get; set; } = DataModels.PlayerState.Inactive;
+    public DataModels.PlayerState currentPlayerState { get; set; } = DataModels.PlayerState.Inactive;
     public static bool ShouldBeOpen { get; private set; } = false;
     private bool WaitingForItemDeletion { get; set; } = false;
     private DataModels.Manual? item { get; set; } = null;
@@ -126,12 +127,12 @@ public unsafe class Plugin : IDalamudPlugin
     }
 
     private const string ActorControlSig = "E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64";
-    private delegate void ActorControlSelfDelegate(uint category, uint eventId, uint param1, uint param2, uint param3, uint param4, uint param5, uint param6, ulong targetId, byte param7);
+    private delegate void ActorControlSelfDelegate(uint category, uint eventId, uint param1, uint param2, uint param3, uint param4, uint param5, uint param6, uint param7, uint param8, ulong targetId, byte param9);
     private Hook<ActorControlSelfDelegate>? actorControlSelfHook;
 
-    private void ActorControlSelf(uint category, uint eventId, uint param1, uint param2, uint param3, uint param4, uint param5, uint param6, ulong targetId, byte param7)
+    private void ActorControlSelf(uint category, uint eventId, uint param1, uint param2, uint param3, uint param4, uint param5, uint param6, uint param7, uint param8, ulong targetId, byte param9)
     {
-        actorControlSelfHook!.Original(category, eventId, param1, param2, param3, param4, param5, param6, targetId, param7);
+        actorControlSelfHook!.Original(category, eventId, param1, param2, param3, param4, param5, param6, param7, param8, targetId, param9);
 
         if (eventId != 7 || Config.CurrentManual == null)
             return;
@@ -141,8 +142,8 @@ public unsafe class Plugin : IDalamudPlugin
             if (param3 < 75)
                 return;
 
-            if ((Config.CurrentManual.Type == DataModels.ManualType.Gathering && playerState == DataModels.PlayerState.Gathering) ||
-                (Config.CurrentManual.Type == DataModels.ManualType.Crafting && playerState == DataModels.PlayerState.Crafting))
+            if ((Config.CurrentManual.Type == DataModels.ManualType.Gathering && currentPlayerState == DataModels.PlayerState.Gathering) ||
+                (Config.CurrentManual.Type == DataModels.ManualType.Crafting && currentPlayerState == DataModels.PlayerState.Crafting))
             {
                 var expTotal = (float)param2;
                 var expMult = (float)param3;
@@ -161,7 +162,7 @@ public unsafe class Plugin : IDalamudPlugin
         if (Config.CurrentManual == null)
             return 0;
 
-        var manualMult = Config.CurrentManual.ExpBoost / (ClientState.LocalPlayer!.Level >= Config.CurrentManual.PenaltyLevel ? 2 : 1);
+        var manualMult = Config.CurrentManual.ExpBoost / (PlayerState.Level >= Config.CurrentManual.PenaltyLevel ? 2 : 1);
         expMult = (expMult / 100f) + 1f;
         var baseExp = expTotal / expMult;
         var expToRemove = (int)(manualMult * baseExp);
@@ -179,13 +180,13 @@ public unsafe class Plugin : IDalamudPlugin
     {
         Logger.Debug("Initializing current manual...");
 
-        if (ClientState.LocalPlayer == null)
+        if (PlayerState == null || ObjectTable?.LocalPlayer == null)
         {
-            Logger.Error("LocalPlayer is null!");
+            Logger.Error("PlayerState is null!");
             return;
         }
 
-        foreach (var status in ClientState.LocalPlayer.StatusList)
+        foreach (var status in ObjectTable.LocalPlayer.StatusList)
         {
             if (status.StatusId == 45 || status.StatusId == 46)
             {
@@ -231,15 +232,15 @@ public unsafe class Plugin : IDalamudPlugin
 
     private bool PassesJobCheck()
     {
-        if (ClientState.LocalPlayer == null || Config.CurrentManual == null)
+        if (PlayerState == null || Config.CurrentManual == null)
             return false;
 
         if (Config.HideForWrongJobs)
         {
-            if (Config.CurrentManual.Type == DataModels.ManualType.Gathering && DataModels.GathererJobs.Contains(ClientState.LocalPlayer.ClassJob.RowId))
+            if (Config.CurrentManual.Type == DataModels.ManualType.Gathering && DataModels.GathererJobs.Contains(PlayerState.ClassJob.RowId))
                 return true;
 
-            if (Config.CurrentManual.Type == DataModels.ManualType.Crafting && DataModels.CrafterJobs.Contains(ClientState.LocalPlayer.ClassJob.RowId))
+            if (Config.CurrentManual.Type == DataModels.ManualType.Crafting && DataModels.CrafterJobs.Contains(PlayerState.ClassJob.RowId))
                 return true;
 
             return false;
@@ -269,11 +270,11 @@ public unsafe class Plugin : IDalamudPlugin
         {
             if (value == true)
             {
-                playerState = DataModels.PlayerState.Crafting;
+                currentPlayerState = DataModels.PlayerState.Crafting;
                 Logger.Debug("Player has started crafting!");
             } else
             {
-                playerState = DataModels.PlayerState.Inactive;
+                currentPlayerState = DataModels.PlayerState.Inactive;
                 Logger.Debug("Player has stopped crafting.");
             }
         }
@@ -281,12 +282,12 @@ public unsafe class Plugin : IDalamudPlugin
         {
             if (value == true)
             {
-                playerState = DataModels.PlayerState.Gathering;
+                currentPlayerState = DataModels.PlayerState.Gathering;
                 Logger.Debug("Player has started gathering!");
             }
             else
             {
-                playerState = DataModels.PlayerState.Inactive;
+                currentPlayerState = DataModels.PlayerState.Inactive;
                 Logger.Debug("Player has stopped gathering.");
             }
         }

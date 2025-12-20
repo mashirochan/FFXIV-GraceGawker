@@ -84,13 +84,13 @@ public class MainWindow : Window, IDisposable
             if (config.ShowPercent)
             {
                 ImGui.SameLine(250 - ImGui.CalcTextSize(progressPercent).X);
-                if (config.ColorPercent && Plugin.ClientState.LocalPlayer != null && Plugin.ClientState.LocalPlayer.Level >= config.CurrentManual.PenaltyLevel)
+                if (config.ColorPercent && Plugin.PlayerState != null && Plugin.PlayerState.Level >= config.CurrentManual.PenaltyLevel)
                 {
-                    ImGui.TextColored(KnownColor.Yellow.Vector(), progressPercent + '%');
+                    ImGui.TextColored(KnownColor.Yellow.Vector(), progressPercent);
                 }
                 else
                 {
-                    ImGui.Text(progressPercent + '%');
+                    ImGui.Text(progressPercent);
                 }
             }
         }
