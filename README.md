@@ -7,7 +7,7 @@
 
 A simple plugin that tracks the remaining EXP left on your Crafter and Gatherer's Grace buffs.
 
-Please not that this plugin simply attempts to give *a rough estimate*. The exact EXP remaining on the buff is not accessible, so all the plugin can do is estimate based off of EXP gains whilst crafting or gathering. Thus, the display value is only properly estimated when a fresh, unused Grace buff is active upload loading the plugin for the first time (or after an update).
+Please not that this plugin simply attempts to give *a rough estimate*. The exact EXP remaining on the buff is not accessible, so all the plugin can do is estimate based off of EXP gains whilst crafting or gathering. Thus, the display value is only properly estimated when a fresh Grace buff is activated after the plugin is loaded.
 
 For any questions or bugs, please [Create an Issue](https://github.com/mashirochan/FFXIV-GraceGawker/issues/new/choose).
 
@@ -38,3 +38,4 @@ Grace Gawker assumes all the following prerequisites are met:
 2. Next, use `/xlplugins` (chat) or `xlplugins` (console) to open up the Plugin Installer.
     * In here, go to `All Plugins`, and `Grace Gawker` should be visible. Enable it.
 3. You should now be able to use `/pgrace` (chat) or `pgrace` (console) to open the Grace Gawker config!
+	* *Note: the plugin can only track Grace buffs if a fresh manual has been activated after enabling the plugin.*

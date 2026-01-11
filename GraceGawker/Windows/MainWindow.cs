@@ -94,5 +94,9 @@ public class MainWindow : Window, IDisposable
                 }
             }
         }
+        else if (config.CurrentManual == null)
+        {
+            ImGui.Text("No Grace buff has been used since starting plugin");
+        }
     }
 }

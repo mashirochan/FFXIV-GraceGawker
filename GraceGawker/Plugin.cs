@@ -39,7 +39,7 @@ public unsafe class Plugin : IDalamudPlugin
     public DataModels.PlayerState currentPlayerState { get; set; } = DataModels.PlayerState.Inactive;
     public static bool ShouldBeOpen { get; private set; } = false;
     private bool WaitingForItemDeletion { get; set; } = false;
-    private DataModels.Manual? item { get; set; } = null;
+    private DataModels.Manual? Item { get; set; } = null;
 
     public Plugin()
     {
@@ -93,8 +93,8 @@ public unsafe class Plugin : IDalamudPlugin
         {
             Logger.Debug($"Action Used: Type = {actionType}, ID = {actionID}, Target ID = {targetID}");
             if (DataModels.Manuals.Any(item => item.Id == actionID)) {
-                item = DataModels.Manuals.FirstOrDefault(item => item.Id == actionID);
-                Logger.Info($"Detected the use of {item!.Name}!");
+                Item = DataModels.Manuals.FirstOrDefault(item => item.Id == actionID);
+                Logger.Info($"Detected the use of {Item!.Name}!");
             }
         }
         catch (Exception ex)
@@ -103,7 +103,7 @@ public unsafe class Plugin : IDalamudPlugin
         }
 
         var useActionReturn = useActionHook!.Original(actionManager, actionType, actionID, targetID, a4, a5, a6, a7);
-        if (item != null)
+        if (Item != null)
         {
             WaitingForItemDeletion = true;
             Logger.Debug("WaitingForItemDeletion set to: True");
@@ -114,15 +114,30 @@ public unsafe class Plugin : IDalamudPlugin
 
     private void OnItemChanged(GameInventoryEvent type, InventoryEventArgs data)
     {
-        if (!WaitingForItemDeletion || item == null || data.Item.ItemId != item.Id)
+        if (!WaitingForItemDeletion)
+        {
+            Logger.Debug("WaitingForItemDeletion is false!");
             return;
+        }
 
-        Config.CurrentManual = item;
+        if (Item == null)
+        {
+            Logger.Debug("Item is null!");
+            return;
+        }
+
+        if (data.Item.ItemId != Item.Id)
+        {
+            Logger.Debug($"data.Item.ItemId ({data.Item.ItemId}) != item.Id ({Item.Id})");
+            return;
+        }
+
+        Config.CurrentManual = Item;
         Config.RemainingExp = Config.CurrentManual.MaxExp;
-        Logger.Info($"{item!.Name} was used successfully!");
+        Logger.Info($"{Item!.Name} was used successfully!");
 
         ShouldBeOpen = true;
-        item = null;
+        Item = null;
         WaitingForItemDeletion = false;
     }
 
