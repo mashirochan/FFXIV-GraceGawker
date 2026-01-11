@@ -1,5 +1,5 @@
 # Grace Gawker
-[![Version number](https://img.shields.io/badge/version-1.1.4.0-ff6262)](https://github.com/mashirochan/GraceGawker)
+[![Version number](https://img.shields.io/badge/version-1.1.5.0-ff6262)](https://github.com/mashirochan/GraceGawker)
 [![Download count](https://img.shields.io/endpoint?url=https%3A%2F%2Fqzysathwfhebdai6xgauhz4q7m0mzmrf.lambda-url.us-east-1.on.aws%2FGraceGawker&color=%23ff6262)](https://github.com/mashirochan/GraceGawker)
 [![Availability](https://img.shields.io/badge/availability-stable-limegreen)](https://github.com/mashirochan/GraceGawker)
 
